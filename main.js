@@ -50,14 +50,6 @@ for (let i = 0; i < pointsOfInterest.length; i++){
 const map = new ol.Map({
   target: 'map',
   layers: [
-    // new ol.layer.Tile({
-    //   source: new ol.source.XYZ({ // https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/0
-    //     url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png',
-    //     attributions: '© Esri, Maxar, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community',
-    //     cacheSize: 500,
-    //     crossOrigin: 'anonymous',
-    //   })
-    // }),
     // BASE LAYER
     new ol.layer.Tile({
       source: new ol.source.XYZ({ // https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/0
@@ -80,3 +72,14 @@ const map = new ol.Map({
     zoom: 18,
   }),
 });
+
+
+// CALCULATE DISTANCES
+let tempLine = []; // Memory allocation
+const calculateDistance = (lonLatA, lonLatB) => {
+  tempLine[0] = lonLatA;
+  tempLine[1] = lonLatB;
+  const line = new ol.geom.LineString(tempLine);
+  const distance = ol.sphere.getLength(line);
+  return distance;
+}
