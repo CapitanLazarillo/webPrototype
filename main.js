@@ -6,6 +6,10 @@ const positions = regattaData.positions;
 
 // Extract unique boat IDs
 const boatIds = Object.keys(positions);//[...new Set(Object.values(positions).flat().map(p => p.i))];
+const boatInternalIds = {};
+for (let i = 0; i < boatIds.length; i++){
+  boatInternalIds[positions[boatIds[i]][0].i] = boatIds[i];
+} 
 
 // Create Boat List
 const boatList = document.getElementById('boat-list');
@@ -102,7 +106,8 @@ map.addLayer(boatLayer);
 
 // Center map on a selected boat
 function centerOnBoat(id) {
-  const boatTrack = Object.values(positions).flat().filter(p => p.i === id);
+  let intId = Object.keys(boatInternalIds).filter(intId => boatInternalIds[intId] == id)[0];
+  const boatTrack = Object.values(positions).flat().filter(p => p.i === intId && p.t <= currentTime);
   if (boatTrack.length > 0) {
     const latest = boatTrack[boatTrack.length - 1];
     map.getView().setCenter(ol.proj.fromLonLat([latest.n, latest.a]));
@@ -112,17 +117,69 @@ function centerOnBoat(id) {
 
 
 
+
+
+
+// OVERLAYS
+const boatOverlays = []; // Store overlays for dynamic updates
+
+function updateBoatPositionsWithHTML(time) {
+  // Remove all existing overlays
+  boatOverlays.forEach(overlay => map.removeOverlay(overlay));
+  boatOverlays.length = 0;
+
+  // Add new overlays for each boat
+  Object.values(positions).forEach(tracks => {
+    const track = tracks.filter(t => t.t <= time);
+    if (track.length > 0) {
+      const latest = track[track.length - 1];
+      const coords = [latest.n, latest.a];
+      const boatId = latest.i;
+      const velocity = latest.s.toFixed(1);
+
+      // Create a boat HTML element
+      const boatElement = document.createElement('div');
+      boatElement.className = 'boat-marker';
+      boatElement.style.cursor = 'pointer';
+      boatElement.id = latest.i;
+
+      // Add onclick event
+      boatElement.onclick = () => {
+        alert(`Boat: ${boatId}\nVelocity: ${velocity} m/s\nCoordinates: ${coords.join(', ')}`);
+        centerOnBoat(boatId);
+      };
+
+      // Create an overlay for the boat
+      const boatOverlay = new ol.Overlay({
+        position: ol.proj.fromLonLat(coords),
+        positioning: 'center-center',
+        element: boatElement,
+        stopEvent: false,
+      });
+
+      // Add overlay to map
+      map.addOverlay(boatOverlay);
+      boatOverlays.push(boatOverlay);
+    }
+  });
+}
+
+
+
 // Update boat positions
 function updateBoatPositions(time) {
+  updateBoatPositionsWithHTML(time);
   boatSource.clear();
+  const secondsOfTrailBehind = 90;
   Object.values(positions).forEach(tracks => {
-    const track = tracks.filter(t => t.t <= time && t.t > time - 1000 * 90);
+    const track = tracks.filter(t => t.t <= time && t.t > time - 1000 * secondsOfTrailBehind);
     if (track.length > 0) {
       const latest = track[track.length - 1];
       const boatFeature = new ol.Feature({
         geometry: new ol.geom.Point(ol.proj.fromLonLat([latest.n, latest.a])),
-        name: `${latest.i}`,
-        velocity: `${latest.s.toFixed(1)} m/s`,
+        name: `${boatInternalIds[latest.i]}`,
+        velocity: `${latest.s.toFixed(1)} knts`,
+        direction: `${latest.c}º`,
       });
 
       // Add style with label
@@ -134,7 +191,7 @@ function updateBoatPositions(time) {
             stroke: new ol.style.Stroke({ color: 'white', width: 1 }),
           }),
           text: new ol.style.Text({
-            text: `${boatFeature.get('name')} (${boatFeature.get('velocity')})`,
+            text: `${boatFeature.get('name')} - ${boatFeature.get('velocity')}, ${boatFeature.get('direction')}`,
             offsetY: -15, // Position label above the boat
             font: '12px Calibri,sans-serif',
             fill: new ol.style.Fill({ color: '#000' }),

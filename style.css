@@ -56,3 +56,12 @@ body {
 #timeline-slider {
   width: 80%;
 }
+
+
+.boat-marker {
+  background-color: rgba(0, 123, 255, 0.8);
+  width: 20px;
+  height: 30px;
+  border-radius: 50% 50% 0 0;
+  cursor: pointer;
+}
