@@ -141,7 +141,9 @@ function updateBoatPositionsWithHTML(time) {
       const boatElement = document.createElement('div');
       boatElement.className = 'boat-marker';
       boatElement.style.cursor = 'pointer';
+      boatElement.style.rotate = latest.c + 'deg';
       boatElement.id = latest.i;
+      
 
       // Add onclick event
       boatElement.onclick = () => {
@@ -192,7 +194,7 @@ function updateBoatPositions(time) {
           }),
           text: new ol.style.Text({
             text: `${boatFeature.get('name')} - ${boatFeature.get('velocity')}, ${boatFeature.get('direction')}`,
-            offsetY: -15, // Position label above the boat
+            offsetY: -25, // Position label above the boat
             font: '12px Calibri,sans-serif',
             fill: new ol.style.Fill({ color: '#000' }),
             stroke: new ol.style.Stroke({ color: '#fff', width: 3 }),
