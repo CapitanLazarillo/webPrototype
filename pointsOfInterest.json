@@ -1,0 +1,92 @@
+{
+  "data": [
+    {
+      "type": "beacon",
+      "name": "baliza babor",
+      "location": [
+        2.198764,
+        41.381568
+      ]
+    },
+    {
+      "type": "beacon",
+      "name": "baliza estribor",
+      "location": [
+        2.200617,
+        41.382582
+      ]
+    },
+    {
+      "type": "rocks",
+      "name": "espigón gas norte",
+      "location": [
+        2.197363,
+        41.381189
+      ]
+    },
+    {
+      "type": "rocks",
+      "name": "espigón gas sur",
+      "location": [
+        2.1969779134994916,
+        41.38036452894076
+      ]
+    },
+    {
+      "type": "rocks",
+      "name": "espigón port olímpic",
+      "location": [
+        2.198832,
+        41.383570
+      ]
+    },
+    {
+      "type": "rocks",
+      "name": "espigón playa somorrostro",
+      "location": [
+        2.198291,
+        41.384392
+      ]
+    },
+    {
+      "type": "beaching",
+      "name": "salida playa somorrostro",
+      "location": [
+        2.197920,
+        41.384699
+      ]
+    },
+    {
+      "type": "rocks",
+      "name": "espigón perejil sur",
+      "location": [
+        2.1939135316631044,
+        41.375982175246975
+      ]
+    },
+    {
+      "type": "rocks",
+      "name": "espigón perejil norte",
+      "location": [
+        2.194716809985046,
+        41.37714790418221
+      ]
+    },
+    {
+      "type": "beacon",
+      "name": "boya hotel vela",
+      "location": [
+        2.1949353429876823,
+        41.37079028048234
+      ]
+    },
+    {
+      "type": "rocks",
+      "name": "espigón hotel vela norte",
+      "location": [
+        2.192471637478085,
+        41.370146226550105
+      ]
+    }
+  ]
+}

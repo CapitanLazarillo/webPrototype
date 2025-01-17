@@ -1,5 +1,6 @@
 
 const regattaData = await fetch('./regatta1.json').then(res => res.json());
+const pointsOfInterest = await fetch('./pointsOfInterest.json').then(res => res.json()).then(file => file.data);
 
 // Load boat data
 const positions = regattaData.positions;
@@ -22,44 +23,19 @@ boatIds.forEach(id => {
 
 
 // POINTS OF INTEREST
-const pointsOfInterest = [
-  {
-    type: 'beacon',
-    name: 'baliza babor',
-    location: [2.198764, 41.381568],
-  },
-  {
-    type: 'beacon',
-    name: 'baliza estribor',
-    location: [2.200617, 41.382582],
-  },
-  {
-    type: 'rocks',
-    name: 'espigón gas',
-    location: [2.197363, 41.381189],
-  },
-  {
-    type: 'rocks',
-    name: 'espigón port olímpic',
-    location: [2.198832, 41.383570],
-  },
-  {
-    type: 'rocks',
-    name: 'espigón somorrostro',
-    location: [2.198291, 41.384392],
-  },
-  {
-    type: 'beaching',
-    name: 'salida playa somorrostro',
-    location: [2.197920, 41.384699],
-  }
-]
+
 // Create OL map features
 let features = [];
 for (let i = 0; i < pointsOfInterest.length; i++) {
   features[i] = new ol.Feature({
     geometry: new ol.geom.Point(ol.proj.fromLonLat(pointsOfInterest[i].location)),
   })
+}
+// Add buoys
+for (let i = 0; i < regattaData.buoys.length; i++){
+  features.push(new ol.Feature({
+    geometry: new ol.geom.Point(ol.proj.fromLonLat([regattaData.buoys[i].lng, regattaData.buoys[i].lat]))
+  }));
 }
 
 
@@ -284,6 +260,16 @@ updateTime();
 // Map click for tooltip
 map.on('click', event => {
   const coords = ol.proj.toLonLat(event.coordinate);
+  // Copy to clipboard
+  let strToCopy = `{
+    "type": "",
+    "name": "",
+    "location": [
+        ${coords[0]},
+        ${coords[1]}
+      ]
+    },`
+  navigator.clipboard.writeText(strToCopy);
   alert(`Lat: ${coords[1]}, Lon: ${coords[0]}`);
 });
 
