@@ -10,3 +10,49 @@ body {
   bottom: 0;
   width: 100%;
 }
+
+
+#sidebar {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 1;
+}
+
+#boat-list {
+  display: flex;
+  flex-direction: column;
+}
+
+#controls {
+  position: absolute;
+  bottom: 55px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 1;
+  text-align: center;
+  width: 80vw;
+}
+
+#timeline {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 1;
+  text-align: center;
+  width: 80vw;
+}
+
+#timeline-slider {
+  width: 80%;
+}
