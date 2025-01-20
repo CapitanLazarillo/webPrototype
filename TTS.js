@@ -38,7 +38,7 @@ class TTS {
   }
 
 
-  speakText = (text) => {
+  speakText = (text, forceNow) => {
     if (!('speechSynthesis' in window)) {
       alert('Speech synthesis is not supported in this browser. Please use Google Chrome.');
       return;
@@ -49,7 +49,9 @@ class TTS {
     }
 
     // Overwrite
-    window.speechSynthesis.cancel();
+    if (forceNow)
+      window.speechSynthesis.cancel();
+    // Speak text
     this.speechSynthesis.text = text;
     window.speechSynthesis.speak(this.speechSynthesis);
 
