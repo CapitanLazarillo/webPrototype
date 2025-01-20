@@ -83,6 +83,22 @@ map.addLayer(boatLayer);
 // Center map on a selected boat
 let selectedBoat = "";
 function centerOnBoat(id) {
+  selectedBoat = id;
+  // HTML change color
+  const boatList = document.getElementById('boat-list');
+  for (let i = 0; i < boatList.children.length; i++){
+    let ch = boatList.children[i];
+    // Selected
+    if (ch.innerText == id){
+      ch.classList.add("selected-boat");
+    }
+    // Not selected
+    else {
+      ch.classList.remove("selected-boat");
+    }
+  }
+
+  // Find internal id
   let intId = Object.keys(boatInternalIds).filter(intId => boatInternalIds[intId] == id)[0];
   // If track has not started yet
   let firstTmst = positions[id][0].t;
@@ -90,7 +106,7 @@ function centerOnBoat(id) {
     currentTime = firstTmst;
     moveTimelineToTmst(currentTime);
   }
-  
+  // Center on boat
   const boatTrack = Object.values(positions).flat().filter(p => p.i === intId && p.t <= currentTime);
   if (boatTrack.length > 0) {
     const latest = boatTrack[boatTrack.length - 1];
