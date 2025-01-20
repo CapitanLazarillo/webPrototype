@@ -81,8 +81,16 @@ map.addLayer(boatLayer);
 
 
 // Center map on a selected boat
+let selectedBoat = "";
 function centerOnBoat(id) {
   let intId = Object.keys(boatInternalIds).filter(intId => boatInternalIds[intId] == id)[0];
+  // If track has not started yet
+  let firstTmst = positions[id][0].t;
+  if (firstTmst > currentTime){
+    currentTime = firstTmst;
+    moveTimelineToTmst(currentTime);
+  }
+  
   const boatTrack = Object.values(positions).flat().filter(p => p.i === intId && p.t <= currentTime);
   if (boatTrack.length > 0) {
     const latest = boatTrack[boatTrack.length - 1];
@@ -245,14 +253,22 @@ function pause() {
   playing = false;
 }
 
+
+function moveTimelineToTmst(tmst) { 
+  currentTime = tmst;
+  updateBoatPositions(tmst);
+  updateTimeline(tmst);
+}
+
+
+
 let prevTime = performance.now();
 function updateTime() {
   if (!playing) return;
   let dt = performance.now() - prevTime;
   if (dt > 500) dt = 100;
   currentTime += dt * speed; // Adjust time based on speed
-  updateBoatPositions(currentTime);
-  updateTimeline(currentTime);
+  moveTimelineToTmst(currentTime);
   prevTime = performance.now();
   requestAnimationFrame(updateTime);
 }
@@ -265,8 +281,7 @@ document.getElementById('speed').addEventListener('change', e => {
 });
 
 // Initialize animation
-updateBoatPositions(startTmst);
-updateTime();
+moveTimelineToTmst(startTmst);
 
 // Map click for tooltip
 map.on('click', event => {
