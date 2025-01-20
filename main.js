@@ -81,7 +81,7 @@ map.addLayer(boatLayer);
 
 
 // Center map on a selected boat
-let selectedBoat = "";
+let selectedBoat = "Zorba";
 function centerOnBoat(id) {
   selectedBoat = id;
   // HTML change color
@@ -99,7 +99,7 @@ function centerOnBoat(id) {
   }
 
   // If track has not started yet
-  let firstTmst = positions[id][0].t;
+  let firstTmst = positions[id][1].t;
   if (firstTmst > currentTime) {
     currentTime = firstTmst;
     moveTimelineToTmst(currentTime);
@@ -292,7 +292,14 @@ let calcDistancesTimer = 0;
 function updateTime() {
   if (!playing) return;
   let dt = performance.now() - prevTime;
+
+  // In case of a long pause, clamp dt
   if (dt > 500) dt = 100;
+
+  // Call interaction manager
+  interactionManager.update(dt);
+
+  // Playback speed
   currentTime += dt * speed; // Adjust time based on speed
   moveTimelineToTmst(currentTime);
   prevTime = performance.now();
@@ -303,8 +310,8 @@ function updateTime() {
   if (calcDistancesTimer > calcDistancesTimeout) {
     calcDistancesTimer = 0;
     let distances = calculateDistances();
-    // Call audio engine
-    // TODO
+    // Call interaction manager
+    interactionManager.updateDistances(distances);
   }
 
 
@@ -329,6 +336,7 @@ document.getElementById('speed').addEventListener('change', e => {
 
 // Initialize animation
 moveTimelineToTmst(startTmst);
+centerOnBoat(selectedBoat);
 
 // Map click for tooltip
 map.on('click', event => {
