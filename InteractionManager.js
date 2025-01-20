@@ -9,9 +9,16 @@ class InteractionManager {
   // Warnings
   warnings = ["proximidad", "objetos cercanos"]; // Escora should be here too
   warningsStatus = [false, false];
+  // Warnings timing
+  warningsPeriod = 10 * 1000; // seconds
+  warningsTimer = 0;
 
   // Keydown timeout (time between key presses)
   keyTimeout = 300; // ms
+
+
+  // Distances (calculated in main.js)
+  distances;
 
   constructor() {
 
@@ -43,7 +50,7 @@ class InteractionManager {
             this.triplePressHandler();
           }
           else if (pressCount > 3) {
-            this. quadruplePressHandler();
+            this.quadruplePressHandler();
           }
           pressCount = 0; // Reset the count after handling
         }, this.keyTimeout); // Adjust the delay (in milliseconds) to suit your needs
@@ -58,15 +65,13 @@ class InteractionManager {
 
   doublePressHandler = () => {
     this.warningsStatus[0] = !this.warningsStatus[0];
-    this.audioEngine.speakText('Alerta ' + this.warnings[0] + ' ' + (this.warningsStatus[0] ? 'on' : 'off'));
+    this.audioEngine.speakText('Alerta ' + this.warnings[0] + ' ' + (this.warningsStatus[0] ? 'activado' : 'desactivado'));
   }
-
 
   triplePressHandler = () => {
     this.warningsStatus[1] = !this.warningsStatus[1];
-    this.audioEngine.speakText('Alerta ' + this.warnings[1] + ' ' + (this.warningsStatus[1] ? 'on' : 'off'));
+    this.audioEngine.speakText('Alerta ' + this.warnings[1] + ' ' + (this.warningsStatus[1] ? 'activado' : 'desactivado'));
   }
-
 
   quadruplePressHandler = () => {
     // Mode none
@@ -92,6 +97,38 @@ class InteractionManager {
   // Activate / deactivate warning
   onOffWarning = (warningIndex) => {
     this.warningsStatus[warningIndex] = !this.warningsStatus[warningIndex];
+  }
+
+
+
+
+
+
+  // UPDATE
+  update(dt) {
+    
+    if (this.warningsStatus[1]) { // Close objects
+      this.warningsTimer += dt;
+      if (this.warningsTimer > this.warningsPeriod){
+        console.log("Warning close objects");
+        this.warningsTimer = 0;
+        if (this.distances != undefined){
+          let str = '';
+          str += this.distances[0].name + ' a ' + parseInt(this.distances[0].distance) + ' metros.';
+          str += this.distances[1].name + ' a ' + parseInt(this.distances[1].distance) + ' metros.';
+          this.audioEngine.speakText(str);
+        }
+
+      }
+    }
+  }
+
+
+
+
+  // PUBLIC FUNCTIONS
+  updateDistances(distances){
+    this.distances = distances;
   }
 
 }
