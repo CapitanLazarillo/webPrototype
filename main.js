@@ -412,3 +412,10 @@ const calculateDistance = (lonLatA, lonLatB) => {
   const distance = ol.sphere.getLength(line);
   return distance;
 }
+
+
+
+
+
+// Interaction manager
+const interactionManager = new InteractionManager();

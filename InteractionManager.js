@@ -3,11 +3,11 @@
 class InteractionManager {
 
   // Modes (constant reporting)
-  modes = ["none", "norte", "amarre", "boia 1", "boia 2", "boia 3"];
+  modes = ["apagado", "norte", "amarre", "boia 1", "boia 2", "boia 3"];
   selectedModeIndex = 0;
 
   // Warnings
-  warnings = ["proximity", "closest object"]; // Escora should be here too
+  warnings = ["proximidad", "objetos cercanos"]; // Escora should be here too
   warningsStatus = [false, false];
 
   // Keydown timeout (time between key presses)
@@ -15,8 +15,11 @@ class InteractionManager {
 
   constructor() {
 
-    // Space down interaction
+    // Keydown (space) interaction
     this.createEventBindings();
+
+    // Create audio engine
+    this.audioEngine = new AudioEngine();
 
   }
 
@@ -24,6 +27,7 @@ class InteractionManager {
   // Event binding
   createEventBindings = () => {
     let pressCount = 0;
+    let timeout;
     document.addEventListener('keydown', (event) => {
       if (event.code === 'Space') { // Check if the pressed key is the spacebar
         pressCount++;
@@ -32,14 +36,14 @@ class InteractionManager {
 
         timeout = setTimeout(() => {
           if (pressCount === 1) {
-            singlePressHandler();
+            this.singlePressHandler();
           } else if (pressCount === 2) {
-            doublePressHandler();
+            this.doublePressHandler();
           } else if (pressCount === 3) {
-            triplePressHandler();
+            this.triplePressHandler();
           }
           else if (pressCount > 3) {
-            quadruplePressHandler();
+            this. quadruplePressHandler();
           }
           pressCount = 0; // Reset the count after handling
         }, this.keyTimeout); // Adjust the delay (in milliseconds) to suit your needs
@@ -49,15 +53,18 @@ class InteractionManager {
 
   singlePressHandler = () => {
     this.changeMode();
+    this.audioEngine.speakText('Modo ' + this.modes[this.selectedModeIndex]);
   }
 
   doublePressHandler = () => {
     this.warningsStatus[0] = !this.warningsStatus[0];
+    this.audioEngine.speakText('Alerta ' + this.warnings[0] + ' ' + (this.warningsStatus[0] ? 'on' : 'off'));
   }
 
 
   triplePressHandler = () => {
     this.warningsStatus[1] = !this.warningsStatus[1];
+    this.audioEngine.speakText('Alerta ' + this.warnings[1] + ' ' + (this.warningsStatus[1] ? 'on' : 'off'));
   }
 
 
@@ -69,6 +76,8 @@ class InteractionManager {
     for (let wS in this.warningsStatus) {
       wS = false;
     }
+
+    this.audioEngine.speakText('Todos los avisos y modos apagados.');
   }
 
 
