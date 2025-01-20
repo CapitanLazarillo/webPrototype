@@ -309,7 +309,7 @@ function updateTime() {
   calcDistancesTimer += dt / 1000;
   if (calcDistancesTimer > calcDistancesTimeout) {
     calcDistancesTimer = 0;
-    let distances = calculateDistances();
+    let distances = calculateDistancesAndBearings();
     // Call interaction manager
     interactionManager.updateDistances(distances);
   }
@@ -365,7 +365,7 @@ map.on('click', event => {
 
 
 // CALCULATE DISTANCES
-function calculateDistances() {
+function calculateDistancesAndBearings() {
   if (selectedBoat == undefined)
     return;
 
@@ -380,7 +380,8 @@ function calculateDistances() {
       type: poi.type,
       name: poi.name,
       location: poi.location,
-      distance: calculateDistance(latestPosition, poi.location)
+      distance: calculateDistance(latestPosition, poi.location),
+      relBearing: calculateRelBearing(latestPosition[0], latestPosition[1], poi.location[0], poi.location[1], latest.c)
     });
   });
   // Boats
@@ -397,7 +398,8 @@ function calculateDistances() {
         type: "boat",
         name: kk,
         location: lP,
-        distance: calculateDistance(latestPosition, lP)
+        distance: calculateDistance(latestPosition, lP),
+        relBearing: calculateRelBearing(latestPosition[0], latestPosition[1], lP[0], lP[1], latest.c)
       })
     }
   });
@@ -408,10 +410,6 @@ function calculateDistances() {
 }
 
 
-
-
-
-
 let tempLine = []; // Memory allocation
 const calculateDistance = (lonLatA, lonLatB) => {
   tempLine[0] = ol.proj.fromLonLat(lonLatA);
@@ -419,6 +417,33 @@ const calculateDistance = (lonLatA, lonLatB) => {
   const line = new ol.geom.LineString(tempLine);
   const distance = ol.sphere.getLength(line);
   return distance;
+}
+
+
+
+// CALCULATE BEARINGS
+const calculateRelBearing = (lon1, lat1, lon2, lat2, bearing) => {
+  let angle = calculateBearing(lon1, lat1, lon2, lat2);
+  return (((angle - bearing) % 360) + 360) % 360;
+}
+const calculateBearing = (lon1, lat1, lon2, lat2) => {
+  // Convert degrees to radians
+  const toRadians = (degrees) => degrees * Math.PI / 180;
+  const toDegrees = (radians) => radians * 180 / Math.PI;
+
+  const φ1 = toRadians(lat1); // Latitude of point 1
+  const φ2 = toRadians(lat2); // Latitude of point 2
+  const Δλ = toRadians(lon2 - lon1); // Longitude difference
+
+  // Compute the bearing
+  const y = Math.sin(Δλ) * Math.cos(φ2);
+  const x = Math.cos(φ1) * Math.sin(φ2) -
+    Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+  let θ = Math.atan2(y, x); // Bearing in radians
+
+  // Convert to degrees and normalize to 0-360
+  θ = toDegrees(θ);
+  return (θ + 360) % 360;
 }
 
 

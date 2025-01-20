@@ -88,7 +88,7 @@ class InteractionManager {
 
 
 
-
+  // INTERNAL FUNCTIONS
   // Change mode
   changeMode = () => {
     this.selectedModeIndex = (this.selectedModeIndex + 1) % this.modes.length;
@@ -99,6 +99,17 @@ class InteractionManager {
     this.warningsStatus[warningIndex] = !this.warningsStatus[warningIndex];
   }
 
+  // Define clock range
+  degreesToClockNumber = (degrees) => {
+    // Divide by 30 to get the hour
+    let clockNumber = Math.round(degrees / 30);
+    // Adjust to 1–12 range (0 becomes 12)
+    if (clockNumber === 0) {
+      clockNumber = 12;
+    }
+    return clockNumber;
+  }
+
 
 
 
@@ -106,16 +117,19 @@ class InteractionManager {
 
   // UPDATE
   update(dt) {
-    
+
     if (this.warningsStatus[1]) { // Close objects
       this.warningsTimer += dt;
-      if (this.warningsTimer > this.warningsPeriod){
+      if (this.warningsTimer > this.warningsPeriod) {
         console.log("Warning close objects");
         this.warningsTimer = 0;
-        if (this.distances != undefined){
+        if (this.distances != undefined) {
+          let clockAngle1 = this.degreesToClockNumber(this.distances[0].relBearing);
+          let clockAngle2 = this.degreesToClockNumber(this.distances[1].relBearing);
+
           let str = '';
-          str += this.distances[0].name + ' a ' + parseInt(this.distances[0].distance) + ' metros.';
-          str += this.distances[1].name + ' a ' + parseInt(this.distances[1].distance) + ' metros.';
+          str += this.distances[0].name + ' a las ' + clockAngle1 + ' a ' + parseInt(this.distances[0].distance) + ' metros.';
+          str += this.distances[1].name + ' a las ' + clockAngle2 + ' a ' + parseInt(this.distances[1].distance) + ' metros.';
           this.audioEngine.speakText(str);
         }
 
@@ -127,7 +141,7 @@ class InteractionManager {
 
 
   // PUBLIC FUNCTIONS
-  updateDistances(distances){
+  updateDistances(distances) {
     this.distances = distances;
   }
 
