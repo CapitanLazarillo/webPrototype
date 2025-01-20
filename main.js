@@ -86,10 +86,10 @@ function centerOnBoat(id) {
   selectedBoat = id;
   // HTML change color
   const boatList = document.getElementById('boat-list');
-  for (let i = 0; i < boatList.children.length; i++){
+  for (let i = 0; i < boatList.children.length; i++) {
     let ch = boatList.children[i];
     // Selected
-    if (ch.innerText == id){
+    if (ch.innerText == id) {
       ch.classList.add("selected-boat");
     }
     // Not selected
@@ -98,15 +98,15 @@ function centerOnBoat(id) {
     }
   }
 
-  // Find internal id
-  let intId = Object.keys(boatInternalIds).filter(intId => boatInternalIds[intId] == id)[0];
   // If track has not started yet
   let firstTmst = positions[id][0].t;
-  if (firstTmst > currentTime){
+  if (firstTmst > currentTime) {
     currentTime = firstTmst;
     moveTimelineToTmst(currentTime);
   }
   // Center on boat
+  // Find internal id
+  let intId = Object.keys(boatInternalIds).filter(intId => boatInternalIds[intId] == id)[0];
   const boatTrack = Object.values(positions).flat().filter(p => p.i === intId && p.t <= currentTime);
   if (boatTrack.length > 0) {
     const latest = boatTrack[boatTrack.length - 1];
@@ -270,7 +270,7 @@ function pause() {
 }
 
 
-function moveTimelineToTmst(tmst) { 
+function moveTimelineToTmst(tmst) {
   currentTime = tmst;
   updateBoatPositions(tmst);
   updateTimeline(tmst);
@@ -278,7 +278,17 @@ function moveTimelineToTmst(tmst) {
 
 
 
+
+
+
+
+
+
+
+// UPDATE FUNCTION
 let prevTime = performance.now();
+let calcDistancesTimeout = 0.5; // seconds
+let calcDistancesTimer = 0;
 function updateTime() {
   if (!playing) return;
   let dt = performance.now() - prevTime;
@@ -286,8 +296,29 @@ function updateTime() {
   currentTime += dt * speed; // Adjust time based on speed
   moveTimelineToTmst(currentTime);
   prevTime = performance.now();
+
+
+  // Calculate distances with objects
+  calcDistancesTimer += dt / 1000;
+  if (calcDistancesTimer > calcDistancesTimeout) {
+    calcDistancesTimer = 0;
+    let distances = calculateDistances();
+    // Call audio engine
+    // TODO
+  }
+
+
+
+
   requestAnimationFrame(updateTime);
 }
+
+
+
+
+
+
+
 
 // Event listeners for controls
 document.getElementById('play').addEventListener('click', play);
@@ -317,11 +348,66 @@ map.on('click', event => {
 
 
 
+
+
+
+
+
+
+
+
 // CALCULATE DISTANCES
+function calculateDistances() {
+  if (selectedBoat == undefined)
+    return;
+
+  let boatTrack = positions[selectedBoat].filter(p => p.t <= currentTime)
+  let latest = boatTrack[boatTrack.length - 1];
+  let latestPosition = [latest.n, latest.a];
+
+  let distancesToOthers = [];
+  // Points of Interest
+  pointsOfInterest.forEach(poi => {
+    distancesToOthers.push({
+      type: poi.type,
+      name: poi.name,
+      location: poi.location,
+      distance: calculateDistance(latestPosition, poi.location)
+    });
+  });
+  // Boats
+  Object.keys(positions).forEach(kk => {
+    if (kk != selectedBoat) {
+      // Boat track
+      let bT = positions[kk].filter(p => p.t <= currentTime);
+      if (bT.length == 0)
+        return;
+      let l = bT[bT.length - 1];
+      let lP = [l.n, l.a];
+      // Distance
+      distancesToOthers.push({
+        type: "boat",
+        name: kk,
+        location: lP,
+        distance: calculateDistance(latestPosition, lP)
+      })
+    }
+  });
+
+  distancesToOthers.sort((a, b) => a.distance - b.distance);
+
+  return distancesToOthers;
+}
+
+
+
+
+
+
 let tempLine = []; // Memory allocation
 const calculateDistance = (lonLatA, lonLatB) => {
-  tempLine[0] = lonLatA;
-  tempLine[1] = lonLatB;
+  tempLine[0] = ol.proj.fromLonLat(lonLatA);
+  tempLine[1] = ol.proj.fromLonLat(lonLatB);
   const line = new ol.geom.LineString(tempLine);
   const distance = ol.sphere.getLength(line);
   return distance;
