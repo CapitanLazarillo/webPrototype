@@ -8,9 +8,9 @@ const positions = regattaData.positions;
 // Extract unique boat IDs
 const boatIds = Object.keys(positions);//[...new Set(Object.values(positions).flat().map(p => p.i))];
 const boatInternalIds = {};
-for (let i = 0; i < boatIds.length; i++){
+for (let i = 0; i < boatIds.length; i++) {
   boatInternalIds[positions[boatIds[i]][0].i] = boatIds[i];
-} 
+}
 
 // Create Boat List
 const boatList = document.getElementById('boat-list');
@@ -32,7 +32,7 @@ for (let i = 0; i < pointsOfInterest.length; i++) {
   })
 }
 // Add buoys
-for (let i = 0; i < regattaData.buoys.length; i++){
+for (let i = 0; i < regattaData.buoys.length; i++) {
   features.push(new ol.Feature({
     geometry: new ol.geom.Point(ol.proj.fromLonLat([regattaData.buoys[i].lng, regattaData.buoys[i].lat]))
   }));
@@ -119,7 +119,7 @@ function updateBoatPositionsWithHTML(time) {
       boatElement.style.cursor = 'pointer';
       boatElement.style.rotate = latest.c + 'deg';
       boatElement.id = latest.i;
-      
+
 
       // Add onclick event
       boatElement.onclick = () => {
@@ -210,6 +210,17 @@ slider.addEventListener('input', () => {
   const date = new Date(selectedTime);
   currentTimestamp.textContent = date.toISOString().split('T')[1].split('.')[0]; // Display HH:MM:SS
   updateBoatPositions(selectedTime);
+});
+
+// Update time slider with arrow keys
+document.addEventListener("keydown", (e) => {
+  if (e.key == "ArrowRight") {
+    slider.value = Math.min(currentTime + 1000 * 60 * 1, endTmst);
+  } else if (e.key == "ArrowLeft") {
+    slider.value = Math.max(currentTime - 1000 * 60 * 1, startTmst);
+  }
+  const virutalE = new Event("input");
+  slider.dispatchEvent(virutalE);
 });
 
 function updateTimeline(time) {
