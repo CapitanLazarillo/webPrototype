@@ -8,7 +8,7 @@ class Mode {
   constructor(name, period, audioEngine) {
     this.name = name;
     this.period = period * 1000;
-    this.timer = period * 1000; // start activated
+    this.timer = (period - 2) * 1000; // start activated
     this.audioEngine = audioEngine;
   }
 
@@ -27,9 +27,9 @@ class Mode {
   }
 
   modeActivated = () => {
-    this.audioEngine.speakText('Modo ' + this.name);
-    // TODO CONNECT EVENT LISTENER. WHEN TTS FINISHES, ALLOW MESSAGES FROM MODO
-    this.timer = this.period; // Reset timer
+    this.audioEngine.speakText('Modo ' + this.name, true)
+    .then(() => this.timer = this.period);// Reset timer
+    
   }
 }
 
@@ -54,7 +54,8 @@ class ModeNorth extends Mode {
 
   sendSignal = (bearing) => {
     let angle = 360 - bearing;
-    this.audioEngine.playAudioFile("N" + degreesToClockNumber(angle), angle);
+    this.audioEngine.playAudioFile("N" + degreesToClockNumber(angle), angle)
+      .catch(e => console.log(e));
     console.log("Modo norte " + degreesToClockNumber(angle) + ", " + angle);
   }
 }
@@ -72,7 +73,8 @@ class ModeNorth extends Mode {
 class ModeBearing extends ModeNorth {
 
   sendSignal = (bearing) => {
-    this.audioEngine.playAudioFile("B" + degreesToClockNumber(bearing), 0); // Bearing should be expressed in front of the user
+    this.audioEngine.playAudioFile("B" + degreesToClockNumber(bearing), 0) // Bearing should be expressed in front of the user
+      .catch(e => console.log(e));
     console.log("Modo rumbo " + degreesToClockNumber(bearing) + ", " + bearing);
   }
 }
@@ -102,7 +104,8 @@ class ModeHome extends Mode {
       .then(() => {
         // And then the distance
         this.audioEngine.speakText("A " + distanceConversion(distanceToHome))
-      });
+      })
+      .catch(e => console.log(e));
 
     console.log("Modo amarre " + clockAngle + ", " + relBearing + ", " + parseInt(distanceToHome));
 
@@ -121,11 +124,12 @@ class ModeBuoy extends ModeHome {
     let buoyFileName = this.name.replace(" ", "");
     let alasFileName = 'alas';
     let clockFileName = clockNumberToESFileName(clockAngle);
-    
+
     this.audioEngine.playAudioFile(buoyFileName, relBearing)
-    .then(() => this.audioEngine.playAudioFile(alasFileName, relBearing))
-    .then(() => this.audioEngine.playAudioFile(clockFileName, relBearing))
-    .then(() => this.audioEngine.speakText("A " + distanceConversion(distanceToBuoy)));
+      .then(() => this.audioEngine.playAudioFile(alasFileName, relBearing))
+      .then(() => this.audioEngine.playAudioFile(clockFileName, relBearing))
+      .then(() => this.audioEngine.speakText("A " + distanceConversion(distanceToBuoy)))
+      .catch(e => console.log(e));
 
     console.log("Modo " + this.name + ", " + clockAngle + ", " + relBearing + ", " + parseInt(distanceToBuoy));
   }

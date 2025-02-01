@@ -27,6 +27,9 @@ class AudioEngine {
       alert("Only one audio channel output in your computer. Stereo and spatial audio not possible.");
     }
 
+    // Keep track of sources. As this are related to filename, we can reuse them
+    this.sources = {};
+
     // Position listener
     this.listener = this.audioContext.listener;
 
@@ -59,7 +62,7 @@ class AudioEngine {
   // TODO: CREATE FILE MANAGER AND HAVE FILE LOADING THERE? NOT NECESSARY AS THIS IS PROTOTYPE!
   // Load recorded audio files
   loadAudioFiles = () => {
-    
+
 
     let categories = ['N', 'B', 'H'];
     let baseURL = './assets/audios/';
@@ -77,8 +80,8 @@ class AudioEngine {
     }
     // Buoys
     let buoyWavFileNames = ['boya1', 'boya2', 'boya3', 'alas', 'una', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce'];
-    for (let i = 0; i < buoyWavFileNames.length; i++){
-      urls.push(baseURL + 'buoys/' +  buoyWavFileNames[i] + '.wav');
+    for (let i = 0; i < buoyWavFileNames.length; i++) {
+      urls.push(baseURL + 'buoys/' + buoyWavFileNames[i] + '.wav');
       fileNames.push(buoyWavFileNames[i]);
     }
 
@@ -114,8 +117,8 @@ class AudioEngine {
 
 
   // Use speech synthesis to talk
-  speakText = (text) => {
-    return this.TTS.speakText(text);
+  speakText = (text, forceNow) => {
+    return this.TTS.speakText(text, forceNow);
   }
 
   playAudioFile = (fileName, angle) => {
@@ -126,9 +129,27 @@ class AudioEngine {
         debugger;
       }
 
-      const source = this.audioContext.createBufferSource(); // Maybe only one source?
-      source.buffer = this.audioBuffers[fileName];
+      
+      // Stop other sources
+      // Iterate sources and stop them
+      Object.keys(this.sources).forEach(kk => {
+        let ss = this.sources[kk];
+        if (ss.isPlaying) {
+          ss.onended = () => reject("New audio overlapping, stop this one.");
+          ss.stop();
+          ss.isPlaying = false;
+        }
+      })
 
+
+
+      // Create source for audio file playback
+      const source = this.audioContext.createBufferSource();
+      source.buffer = this.audioBuffers[fileName];
+      this.sources[fileName] = source;
+
+
+    
       // Position the source (panner)
       this.panner.positionZ.value = -Math.cos(angle * Math.PI / 180) * 2;
       this.panner.positionX.value = Math.sin(angle * Math.PI / 180) * 2;
@@ -140,11 +161,13 @@ class AudioEngine {
       // Return promise
       source.onended = () => {
         console.log("Play audio file ended");
+        source.isPlaying = false;
         resolve();
       };
 
       // Play audio
       source.start();
+      source.isPlaying = true;
     });
 
 
