@@ -1,6 +1,37 @@
+// Create audio context
+window.onload =() => {
+  window.actx = new AudioContext();
+}
 
 const regattaData = await fetch('./regatta1.json').then(res => res.json());
 const pointsOfInterest = await fetch('./pointsOfInterest.json').then(res => res.json()).then(file => file.data);
+
+// Interaction manager
+const interactionManager = new InteractionManager();
+interactionManager.audioEngine.setAudioContext(window.actx);
+interactionManager.audioEngine.loadAudioFiles();
+// Audio context
+
+// let isAudioCtxStarted = false;
+// const startAudioContext = function () {
+//   if (isAudioCtxStarted)
+//     return;
+//   isAudioCtxStarted = true;
+//   console.log("Starting audio context");
+//   let audioCtx = 
+//   interactionManager.audioEngine.setAudioContext(audioCtx);
+//   interactionManager.audioEngine.loadAudioFiles();
+// }
+// // User events
+// // https://developer.chrome.com/blog/autoplay/#webaudio
+// //document.addEventListener("visibilitychange", startAudioContext, {once: true});
+// //document.addEventListener("load", startAudioContext, {once: true});
+// //document.addEventListener("touchstart", startAudioContext, {once: true});
+// //document.addEventListener("focus", startAudioContext, {once: true});
+// //document.addEventListener("mousemove", startAudioContext, { once: true });
+
+
+
 
 // Load boat data
 const positions = regattaData.positions;
@@ -450,5 +481,3 @@ const calculateBearing = (lon1, lat1, lon2, lat2) => {
 
 
 
-// Interaction manager
-const interactionManager = new InteractionManager();
