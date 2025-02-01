@@ -1,9 +1,13 @@
 
+import { Mode, ModeNorth, ModeBearing, ModeHome} from './Mode.js';
 
-class InteractionManager {
+
+export class InteractionManager {
 
   // Modes (constant reporting)
-  modes = ["apagado", "norte", "amarre", "boia 1", "boia 2", "boia 3"];
+  modes = ["apagado", "norte", "rumbo", "amarre", "boia 1", "boia 2", "boia 3"];
+  modeObjects = [];
+  modeConstructors = ["", ModeNorth, ModeBearing, ModeHome, Mode, Mode, Mode];
   selectedModeIndex = 0;
 
   // Warnings
@@ -11,7 +15,7 @@ class InteractionManager {
   warningsStatus = [false, false];
   // Warnings timing
   warningsPeriod = 10 * 1000; // seconds
-  warningsTimer = 0;
+  warningsTimer = 10 * 1000; // Start activated
 
   // Keydown timeout (time between key presses)
   keyTimeout = 300; // ms
@@ -19,14 +23,25 @@ class InteractionManager {
 
   // Distances (calculated in main.js)
   distances;
+  selfBearing = 0;
 
   constructor() {
+
+    // Create audio engine
+    this.audioEngine = new AudioEngine();
+
+    // Create Mode objects
+    this.modeObjects = [undefined]; // off
+    for (let i = 1; i < this.modes.length; i++) {
+      let mConst = this.modeConstructors[i];
+      this.modeObjects[i] = new mConst(this.modes[i], 5, this.audioEngine);
+    }
+
 
     // Keydown (space) interaction
     this.createEventBindings();
 
-    // Create audio engine
-    this.audioEngine = new AudioEngine();
+    
 
   }
 
@@ -60,7 +75,7 @@ class InteractionManager {
 
   singlePressHandler = () => {
     this.changeMode();
-    this.audioEngine.speakText('Modo ' + this.modes[this.selectedModeIndex]);
+    //this.audioEngine.speakText('Modo ' + this.modes[this.selectedModeIndex]);
   }
 
   doublePressHandler = () => {
@@ -92,6 +107,8 @@ class InteractionManager {
   // Change mode
   changeMode = () => {
     this.selectedModeIndex = (this.selectedModeIndex + 1) % this.modes.length;
+    if (this.selectedModeIndex != 0)
+      this.modeObjects[this.selectedModeIndex].modeActivated();
   }
 
   // Activate / deactivate warning
@@ -99,16 +116,7 @@ class InteractionManager {
     this.warningsStatus[warningIndex] = !this.warningsStatus[warningIndex];
   }
 
-  // Define clock range
-  degreesToClockNumber = (degrees) => {
-    // Divide by 30 to get the hour
-    let clockNumber = Math.round(degrees / 30);
-    // Adjust to 1–12 range (0 becomes 12)
-    if (clockNumber === 0) {
-      clockNumber = 12;
-    }
-    return clockNumber;
-  }
+  
 
 
 
@@ -118,18 +126,31 @@ class InteractionManager {
   // UPDATE
   update(dt) {
 
+    // Update mode
+    if (this.selectedModeIndex != 0 && this.distances != undefined){
+      // Home mode
+      if (this.modes[this.selectedModeIndex] == 'amarre') {
+        let distHomeArray = this.distances.filter(item => item.type == 'home');
+        let distHome = distHomeArray[0];
+        this.modeObjects[this.selectedModeIndex].update(dt, distHome.distance, distHome.relBearing);
+      } 
+      // Other modes
+      else
+        this.modeObjects[this.selectedModeIndex].update(dt, this.selfBearing);
+    }
+
     if (this.warningsStatus[1]) { // Close objects
       this.warningsTimer += dt;
       if (this.warningsTimer > this.warningsPeriod) {
         console.log("Warning close objects");
         this.warningsTimer = 0;
         if (this.distances != undefined) {
-          let clockAngle1 = this.degreesToClockNumber(this.distances[0].relBearing);
-          let clockAngle2 = this.degreesToClockNumber(this.distances[1].relBearing);
+          let clockAngle1 = degreesToClockNumber(this.distances[0].relBearing);
+          let clockAngle2 = degreesToClockNumber(this.distances[1].relBearing);
 
           let str = '';
-          str += this.distances[0].name + ' a las ' + clockAngle1 + ' a ' + parseInt(this.distances[0].distance) + ' metros.';
-          str += this.distances[1].name + ' a las ' + clockAngle2 + ' a ' + parseInt(this.distances[1].distance) + ' metros.';
+          str += this.distances[0].name + ' a las ' + clockAngle1 + ' a ' + distanceConversion(this.distances[0].distance);
+          str += this.distances[1].name + ' a las ' + clockAngle2 + ' a ' + distanceConversion(this.distances[1].distance);
           this.audioEngine.speakText(str);
         }
 
@@ -144,5 +165,12 @@ class InteractionManager {
   updateDistances(distances) {
     this.distances = distances;
   }
+  updateBearing(angle) {
+    this.selfBearing = angle;
+  }
 
 }
+
+
+
+export default InteractionManager
