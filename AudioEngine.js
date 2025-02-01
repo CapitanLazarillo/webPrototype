@@ -22,6 +22,11 @@ class AudioEngine {
   setAudioContext = (audioContext) => {
     this.audioContext = audioContext;
 
+    // Stereo
+    if (this.audioContext.destination.maxChannelCount < 2){
+      alert("Only one audio channel output in your computer. Stereo and spatial audio not possible.");
+    }
+
     // Position listener
     this.listener = this.audioContext.listener;
 
@@ -31,7 +36,7 @@ class AudioEngine {
     this.panner = this.audioContext.createPanner();
     this.panner.panningModel = 'HRTF';
     this.panner.distanceModel = 'exponential';
-    this.panner.rolloffFactor = 10;
+    this.panner.rolloffFactor = 1;
 
   }
   // Resume or create audio context
@@ -101,8 +106,10 @@ class AudioEngine {
     source.buffer = this.audioBuffers[fileName];
 
     // Position the source (panner)
-    this.panner.positionZ.value = -Math.cos(angle * Math.PI / 180);
-    this.panner.positionX.value = Math.sin(angle * Math.PI / 180);
+    this.panner.positionZ.value = -Math.cos(angle * Math.PI / 180) * 2;
+    this.panner.positionX.value = Math.sin(angle * Math.PI / 180) * 2;
+
+    console.log(parseFloat(this.panner.positionZ.value, 1) + ", " + parseFloat(this.panner.positionX.value, 1));
 
     // Connect pipeline
     source.connect(this.panner);
