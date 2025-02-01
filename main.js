@@ -3,7 +3,7 @@ import InteractionManager from './InteractionManager.js';
 window.hullLength = 5.8; // meters
 
 // Create audio context
-window.onload =() => {
+window.onload = () => {
   window.actx = new AudioContext();
 }
 
@@ -39,6 +39,7 @@ interactionManager.audioEngine.loadAudioFiles();
 
 // Load boat data
 const positions = regattaData.positions;
+const buoys = regattaData.buoys;
 
 // Extract unique boat IDs
 const boatIds = Object.keys(positions);//[...new Set(Object.values(positions).flat().map(p => p.i))];
@@ -422,6 +423,7 @@ function calculateDistancesAndBearings() {
       relBearing: calculateRelBearing(latestPosition[0], latestPosition[1], poi.location[0], poi.location[1], latest.c)
     });
   });
+
   // Boats
   Object.keys(positions).forEach(kk => {
     if (kk != selectedBoat) {
@@ -442,6 +444,19 @@ function calculateDistancesAndBearings() {
     }
   });
 
+  // Buoys
+  buoys.forEach(buoy => {
+    let buoyLoc = [buoy.lng, buoy.lat];
+    distancesToOthers.push({
+      type: "buoy",
+      name: "boya " + buoy.name,
+      location: buoyLoc,
+      distance: calculateDistance(latestPosition, buoyLoc),
+      relBearing: calculateRelBearing(latestPosition[0], latestPosition[1], buoy.lng, buoy.lat, latest.c)
+    });
+  });
+
+  // Sort
   distancesToOthers.sort((a, b) => a.distance - b.distance);
 
   return distancesToOthers;

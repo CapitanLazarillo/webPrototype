@@ -5,7 +5,7 @@ import { Mode, ModeNorth, ModeBearing, ModeHome} from './Mode.js';
 export class InteractionManager {
 
   // Modes (constant reporting)
-  modes = ["apagado", "norte", "rumbo", "amarre", "boia 1", "boia 2", "boia 3"];
+  modes = ["apagado", "norte", "rumbo", "amarre", "boya 1", "boya 2", "boya 3"];
   modeObjects = [];
   modeConstructors = ["", ModeNorth, ModeBearing, ModeHome, Mode, Mode, Mode];
   selectedModeIndex = 0;
