@@ -149,8 +149,8 @@ export class InteractionManager {
           let clockAngle2 = degreesToClockNumber(this.distances[1].relBearing);
 
           let str = '';
-          str += this.distances[0].name + ' a las ' + clockAngle1 + ' a ' + parseInt(this.distances[0].distance) + ' metros.';
-          str += this.distances[1].name + ' a las ' + clockAngle2 + ' a ' + parseInt(this.distances[1].distance) + ' metros.';
+          str += this.distances[0].name + ' a las ' + clockAngle1 + ' a ' + distanceConversion(this.distances[0].distance);
+          str += this.distances[1].name + ' a las ' + clockAngle2 + ' a ' + distanceConversion(this.distances[1].distance);
           this.audioEngine.speakText(str);
         }
 
