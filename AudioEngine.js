@@ -54,27 +54,48 @@ class AudioEngine {
   //     }
   //   }
   // }
+
+
+  // TODO: CREATE FILE MANAGER AND HAVE FILE LOADING THERE? NOT NECESSARY AS THIS IS PROTOTYPE!
   // Load recorded audio files
   loadAudioFiles = () => {
-    console.log("Loading " + 3 * 12 + " audio files");
+    
 
     let categories = ['N', 'B', 'H'];
     let baseURL = './assets/audios/';
+    let urls = [];
+    let fileNames = [];
+
+    // URLS
     // Categories
     for (let cInd = 0; cInd < 3; cInd++) {
       // Clock hours
       for (let i = 1; i < 13; i++) {
-        let promise = fetch(baseURL + categories[cInd] + i + '.wav')
-          .then(r => r.arrayBuffer())
-          .then(data => this.audioContext.decodeAudioData(data))
-          .then(buffer => {
-            this.audioBuffers[categories[cInd] + i] = buffer;
-            return buffer;
-          })
-          .catch(e => { debugger; console.error(e) });
-
-        this.promises.push(promise);
+        urls.push(baseURL + categories[cInd] + i + '.wav');
+        fileNames.push(categories[cInd] + i);
       }
+    }
+    // Buoys
+    let buoyWavFileNames = ['boya1', 'boya2', 'boya3', 'alas', 'una', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce'];
+    for (let i = 0; i < buoyWavFileNames.length; i++){
+      urls.push(baseURL + 'buoys/' +  buoyWavFileNames[i] + '.wav');
+      fileNames.push(buoyWavFileNames[i]);
+    }
+
+
+    console.log("Loading " + urls.length + " audio files");
+    // Promises
+    for (let i = 0; i < urls.length; i++) {
+      let promise = fetch(urls[i])
+        .then(r => r.arrayBuffer())
+        .then(data => this.audioContext.decodeAudioData(data))
+        .then(buffer => {
+          this.audioBuffers[fileNames[i]] = buffer;
+          return buffer;
+        })
+        .catch(e => { debugger; console.error(e) });
+
+      this.promises.push(promise);
     }
 
     // All audio files lodaded
