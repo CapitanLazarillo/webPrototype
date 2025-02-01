@@ -21,22 +21,34 @@ class AudioEngine {
   // Set audio context
   setAudioContext = (audioContext) => {
     this.audioContext = audioContext;
+
+    // Position listener
+    this.listener = this.audioContext.listener;
+
+    // Panner node (actually where the source is)
+    // Panner for HRTF
+    // -Z is forward, +Y is up, +X is right
+    this.panner = this.audioContext.createPanner();
+    this.panner.panningModel = 'HRTF';
+    this.panner.distanceModel = 'exponential';
+    this.panner.rolloffFactor = 10;
+
   }
   // Resume or create audio context
   // https://developer.chrome.com/blog/autoplay/#webaudio
-  resumeAudioContext = () => {
-    if (this.audioContext == undefined) {
-      debugger;
-      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    } else {
-      if (this.audioContext.state == 'suspended') {
-        this.audioContext.resume();
-      } else {
-        console.log("AudioContext was already running");
-        debugger;
-      }
-    }
-  }
+  // resumeAudioContext = () => {
+  //   if (this.audioContext == undefined) {
+  //     debugger;
+  //     this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  //   } else {
+  //     if (this.audioContext.state == 'suspended') {
+  //       this.audioContext.resume();
+  //     } else {
+  //       console.log("AudioContext was already running");
+  //       debugger;
+  //     }
+  //   }
+  // }
   // Load recorded audio files
   loadAudioFiles = () => {
     console.log("Loading " + 3 * 12 + " audio files");
@@ -72,8 +84,32 @@ class AudioEngine {
 
 
 
+
+
+
   // Use speech synthesis to talk
   speakText = (text) => {
     this.TTS.speakText(text);
+  }
+
+  playAudioFile = (fileName, angle) => {
+    if (this.audioBuffers[fileName] == undefined) {
+      debugger;
+    }
+
+    const source = this.audioContext.createBufferSource(); // Maybe only one source?
+    source.buffer = this.audioBuffers[fileName];
+
+    // Position the source (panner)
+    this.panner.positionZ.value = -Math.cos(angle * Math.PI / 180);
+    this.panner.positionX.value = Math.sin(angle * Math.PI / 180);
+
+    // Connect pipeline
+    source.connect(this.panner);
+    this.panner.connect(this.audioContext.destination);
+
+    // Play audio
+    source.start();
+
   }
 }
