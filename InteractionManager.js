@@ -1,5 +1,5 @@
 
-import { Mode, ModeNorth, ModeBearing, ModeHome} from './Mode.js';
+import { Mode, ModeNorth, ModeBearing, ModeHome, ModeBuoy } from './Mode.js';
 
 
 export class InteractionManager {
@@ -7,7 +7,7 @@ export class InteractionManager {
   // Modes (constant reporting)
   modes = ["apagado", "norte", "rumbo", "amarre", "boya 1", "boya 2", "boya 3"];
   modeObjects = [];
-  modeConstructors = ["", ModeNorth, ModeBearing, ModeHome, Mode, Mode, Mode];
+  modeConstructors = ["", ModeNorth, ModeBearing, ModeHome, ModeBuoy, ModeBuoy, ModeBuoy];
   selectedModeIndex = 0;
 
   // Warnings
@@ -25,8 +25,8 @@ export class InteractionManager {
   distances;
   selfBearing = 0;
 
-  constructor() {
-
+  constructor(forceDistanceCalculations) {
+    this.forceDistanceCalculations = forceDistanceCalculations;
     // Create audio engine
     this.audioEngine = new AudioEngine();
 
@@ -41,7 +41,7 @@ export class InteractionManager {
     // Keydown (space) interaction
     this.createEventBindings();
 
-    
+
 
   }
 
@@ -74,8 +74,10 @@ export class InteractionManager {
   }
 
   singlePressHandler = () => {
+    // Update distances
+    this.forceDistanceCalculations();
+    // Change mode
     this.changeMode();
-    //this.audioEngine.speakText('Modo ' + this.modes[this.selectedModeIndex]);
   }
 
   doublePressHandler = () => {
@@ -109,6 +111,8 @@ export class InteractionManager {
     this.selectedModeIndex = (this.selectedModeIndex + 1) % this.modes.length;
     if (this.selectedModeIndex != 0)
       this.modeObjects[this.selectedModeIndex].modeActivated();
+    else
+      this.audioEngine.speakText('Modo apagado', true);
   }
 
   // Activate / deactivate warning
@@ -116,7 +120,7 @@ export class InteractionManager {
     this.warningsStatus[warningIndex] = !this.warningsStatus[warningIndex];
   }
 
-  
+
 
 
 
@@ -127,13 +131,19 @@ export class InteractionManager {
   update(dt) {
 
     // Update mode
-    if (this.selectedModeIndex != 0 && this.distances != undefined){
+    if (this.selectedModeIndex != 0 && this.distances != undefined) {
       // Home mode
       if (this.modes[this.selectedModeIndex] == 'amarre') {
         let distHomeArray = this.distances.filter(item => item.type == 'home');
         let distHome = distHomeArray[0];
         this.modeObjects[this.selectedModeIndex].update(dt, distHome.distance, distHome.relBearing);
-      } 
+      }
+      // Buoys
+      else if (this.modes[this.selectedModeIndex].includes("boya")) {
+        let distBuoyArray = this.distances.filter(item => item.name == this.modes[this.selectedModeIndex]);
+        let distBuoy = distBuoyArray[0];
+        this.modeObjects[this.selectedModeIndex].update(dt, distBuoy.distance, distBuoy.relBearing);
+      }
       // Other modes
       else
         this.modeObjects[this.selectedModeIndex].update(dt, this.selfBearing);

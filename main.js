@@ -10,8 +10,14 @@ window.onload = () => {
 const regattaData = await fetch('./regatta1.json').then(res => res.json());
 const pointsOfInterest = await fetch('./pointsOfInterest.json').then(res => res.json()).then(file => file.data);
 
+
+// forceCalculateDistancesAndBearings
+const forceDistanceCalculations = () => {
+  calcDistancesTimer = calcDistancesTimeout;
+  updateTime();
+}
 // Interaction manager
-const interactionManager = new InteractionManager();
+const interactionManager = new InteractionManager(forceDistanceCalculations);
 interactionManager.audioEngine.setAudioContext(window.actx);
 interactionManager.audioEngine.loadAudioFiles();
 // Audio context
