@@ -3,7 +3,7 @@
 class InteractionManager {
 
   // Modes (constant reporting)
-  modes = ["apagado", "norte", "amarre", "boia 1", "boia 2", "boia 3"];
+  modes = ["apagado", "norte", "rumbo", "amarre", "boia 1", "boia 2", "boia 3"];
   selectedModeIndex = 0;
 
   // Warnings
@@ -11,7 +11,7 @@ class InteractionManager {
   warningsStatus = [false, false];
   // Warnings timing
   warningsPeriod = 10 * 1000; // seconds
-  warningsTimer = 0;
+  warningsTimer = 10 * 1000; // Start activated
 
   // Keydown timeout (time between key presses)
   keyTimeout = 300; // ms
