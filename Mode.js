@@ -7,8 +7,8 @@ class Mode {
 
   constructor(name, period, audioEngine) {
     this.name = name;
-    this.period = period;
-    this.timer = period; // start activated
+    this.period = period * 1000;
+    this.timer = period * 1000; // start activated
     this.audioEngine = audioEngine;
   }
 
@@ -51,6 +51,7 @@ class ModeNorth extends Mode {
 
   sendSignal = (clockNumber, bearing) => {
     this.audioEngine.playAudioFile("N" + clockNumber, bearing);
+    console.log("Modo norte " + clockNumber + ", " + bearing);
   }
 }
 
