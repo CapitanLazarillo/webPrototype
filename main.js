@@ -93,7 +93,7 @@ const map = new ol.Map({
     // BASE LAYER
     new ol.layer.Tile({
       source: new ol.source.XYZ({ // https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/0
-        url: 'http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}',
+        url: 'https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}',
         attributions: 'Imatges ©2025 Google, Imatges ©2025 Airbus, Maxar Technologies, Dades del mapa ©2025 Inst. Geogr. Nacional',
         cacheSize: 500,
         crossOrigin: 'anonymous',
