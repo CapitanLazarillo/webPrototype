@@ -1,5 +1,5 @@
 
-import { Mode, ModeNorth } from './Mode.js';
+import { Mode, ModeNorth, ModeBearing, ModeHome} from './Mode.js';
 
 
 export class InteractionManager {
@@ -7,6 +7,7 @@ export class InteractionManager {
   // Modes (constant reporting)
   modes = ["apagado", "norte", "rumbo", "amarre", "boia 1", "boia 2", "boia 3"];
   modeObjects = [];
+  modeConstructors = ["", ModeNorth, ModeBearing, ModeHome, Mode, Mode, Mode];
   selectedModeIndex = 0;
 
   // Warnings
@@ -32,10 +33,8 @@ export class InteractionManager {
     // Create Mode objects
     this.modeObjects = [undefined]; // off
     for (let i = 1; i < this.modes.length; i++) {
-      if (this.modes[i] == "norte") {
-        this.modeObjects[i] = new ModeNorth(this.modes[i], 5, this.audioEngine);
-      } else
-        this.modeObjects[i] = new Mode(this.modes[i], 5, this.audioEngine);
+      let mConst = this.modeConstructors[i];
+      this.modeObjects[i] = new mConst(this.modes[i], 5, this.audioEngine);
     }
 
 
@@ -117,16 +116,7 @@ export class InteractionManager {
     this.warningsStatus[warningIndex] = !this.warningsStatus[warningIndex];
   }
 
-  // Define clock range
-  degreesToClockNumber = (degrees) => {
-    // Divide by 30 to get the hour
-    let clockNumber = Math.round(degrees / 30);
-    // Adjust to 1–12 range (0 becomes 12)
-    if (clockNumber === 0) {
-      clockNumber = 12;
-    }
-    return clockNumber;
-  }
+  
 
 
 
@@ -137,8 +127,16 @@ export class InteractionManager {
   update(dt) {
 
     // Update mode
-    if (this.selectedModeIndex != 0){
-      this.modeObjects[this.selectedModeIndex].update(dt, this.degreesToClockNumber(this.selfBearing), this.selfBearing);
+    if (this.selectedModeIndex != 0 && this.distances != undefined){
+      // Home mode
+      if (this.modes[this.selectedModeIndex] == 'amarre') {
+        let distHomeArray = this.distances.filter(item => item.type == 'home');
+        let distHome = distHomeArray[0];
+        this.modeObjects[this.selectedModeIndex].update(dt, distHome.distance, distHome.relBearing);
+      } 
+      // Other modes
+      else
+        this.modeObjects[this.selectedModeIndex].update(dt, this.selfBearing);
     }
 
     if (this.warningsStatus[1]) { // Close objects
@@ -147,8 +145,8 @@ export class InteractionManager {
         console.log("Warning close objects");
         this.warningsTimer = 0;
         if (this.distances != undefined) {
-          let clockAngle1 = this.degreesToClockNumber(this.distances[0].relBearing);
-          let clockAngle2 = this.degreesToClockNumber(this.distances[1].relBearing);
+          let clockAngle1 = degreesToClockNumber(this.distances[0].relBearing);
+          let clockAngle2 = degreesToClockNumber(this.distances[1].relBearing);
 
           let str = '';
           str += this.distances[0].name + ' a las ' + clockAngle1 + ' a ' + parseInt(this.distances[0].distance) + ' metros.';

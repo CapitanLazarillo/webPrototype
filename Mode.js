@@ -15,9 +15,7 @@ class Mode {
 
   // PUBLIC METHODS
   update = (dt) => {
-
     this.timer += dt;
-
     if (this.timer > this.period) {
       this.timer = 0;
       this.sendSignal();
@@ -37,25 +35,63 @@ class Mode {
 
 
 
+
+
 class ModeNorth extends Mode {
 
-  update = (dt, clockNumber, bearing) => {
-
+  update = (dt, bearing) => {
     this.timer += dt;
-
     if (this.timer > this.period) {
       this.timer = 0;
-      this.sendSignal(clockNumber, bearing);
+      this.sendSignal(bearing);
     }
   }
 
-  sendSignal = (clockNumber, bearing) => {
-    this.audioEngine.playAudioFile("N" + clockNumber, bearing);
-    console.log("Modo norte " + clockNumber + ", " + bearing);
+  sendSignal = (bearing) => {
+    let angle = 360 - bearing;
+    this.audioEngine.playAudioFile("N" + degreesToClockNumber(angle), angle);
+    console.log("Modo norte " + degreesToClockNumber(angle) + ", " + angle);
   }
 }
 
-export {Mode, ModeNorth};
+
+
+
+
+
+
+class ModeBearing extends ModeNorth {
+
+  sendSignal = (bearing) => {
+    this.audioEngine.playAudioFile("B" + degreesToClockNumber(bearing), 0); // Bearing should be expressed in front of the user
+    console.log("Modo rumbo " + degreesToClockNumber(bearing) + ", " + bearing);
+  }
+}
+
+
+
+
+class ModeHome extends Mode {
+  // Update requires own position and home position
+  update = (dt, distanceToHome, relBearing) => {
+    this.timer += dt;
+    if (this.timer > this.period) {
+      this.timer = 0;
+      this.sendSignal(distanceToHome, relBearing);
+    }
+  }
+  // Calculate distance and relative orientation
+  sendSignal = (distanceToHome, relBearing) => {
+
+    let clockAngle = degreesToClockNumber(relBearing);
+    this.audioEngine.playAudioFile("H" + clockAngle, relBearing);
+    // .then(this.audioEngine.speakText("A " + distanceToHome + " metros."))
+
+  }
+}
+
+
+export { Mode, ModeNorth, ModeBearing, ModeHome };
 
 
 
