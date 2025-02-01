@@ -1,5 +1,5 @@
 
-import { Mode, ModeNorth, ModeBearing, ModeHome, ModeBuoy} from './Mode.js';
+import { Mode, ModeNorth, ModeBearing, ModeHome, ModeBuoy } from './Mode.js';
 
 
 export class InteractionManager {
@@ -41,7 +41,7 @@ export class InteractionManager {
     // Keydown (space) interaction
     this.createEventBindings();
 
-    
+
 
   }
 
@@ -111,6 +111,8 @@ export class InteractionManager {
     this.selectedModeIndex = (this.selectedModeIndex + 1) % this.modes.length;
     if (this.selectedModeIndex != 0)
       this.modeObjects[this.selectedModeIndex].modeActivated();
+    else
+      this.audioEngine.speakText('Modo apagado', true);
   }
 
   // Activate / deactivate warning
@@ -118,7 +120,7 @@ export class InteractionManager {
     this.warningsStatus[warningIndex] = !this.warningsStatus[warningIndex];
   }
 
-  
+
 
 
 
@@ -129,15 +131,15 @@ export class InteractionManager {
   update(dt) {
 
     // Update mode
-    if (this.selectedModeIndex != 0 && this.distances != undefined){
+    if (this.selectedModeIndex != 0 && this.distances != undefined) {
       // Home mode
       if (this.modes[this.selectedModeIndex] == 'amarre') {
         let distHomeArray = this.distances.filter(item => item.type == 'home');
         let distHome = distHomeArray[0];
         this.modeObjects[this.selectedModeIndex].update(dt, distHome.distance, distHome.relBearing);
-      } 
+      }
       // Buoys
-      else if (this.modes[this.selectedModeIndex].includes("boya")){
+      else if (this.modes[this.selectedModeIndex].includes("boya")) {
         let distBuoyArray = this.distances.filter(item => item.name == this.modes[this.selectedModeIndex]);
         let distBuoy = distBuoyArray[0];
         this.modeObjects[this.selectedModeIndex].update(dt, distBuoy.distance, distBuoy.relBearing);
