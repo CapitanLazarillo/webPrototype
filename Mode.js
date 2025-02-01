@@ -28,8 +28,8 @@ class Mode {
 
   modeActivated = () => {
     this.audioEngine.speakText('Modo ' + this.name, true)
-    .then(() => this.timer = this.period);// Reset timer
-    
+      .then(() => this.timer = this.period);// Reset timer
+
   }
 }
 
