@@ -94,7 +94,7 @@ class AudioEngine {
 
   // Use speech synthesis to talk
   speakText = (text) => {
-    this.TTS.speakText(text);
+    return this.TTS.speakText(text);
   }
 
   playAudioFile = (fileName, angle) => {

@@ -39,21 +39,28 @@ class TTS {
 
 
   speakText = (text, forceNow) => {
-    if (!('speechSynthesis' in window)) {
-      alert('Speech synthesis is not supported in this browser. Please use Google Chrome.');
-      return;
-    }
-    if (!this.isTTSReady) {
-      alert('Speech synthesis is not ready (voices not loaded)');
-      return;
-    }
+    return new Promise((resolve, reject) => {
 
-    // Overwrite
-    if (forceNow)
-      window.speechSynthesis.cancel();
-    // Speak text
-    this.speechSynthesis.text = text;
-    window.speechSynthesis.speak(this.speechSynthesis);
+      if (!('speechSynthesis' in window)) {
+        alert('Speech synthesis is not supported in this browser. Please use Google Chrome.');
+        reject(new Error ('Speech synthesis not supported'));
+        return;
+      }
+      if (!this.isTTSReady) {
+        alert('Speech synthesis is not ready (voices not loaded)');
+        reject(new Error ('Speech synthesis is not ready (voices not loaded)'));
+        return;
+      }
+
+      // Overwrite
+      if (forceNow)
+        window.speechSynthesis.cancel();
+      // Speak text
+      this.speechSynthesis.text = text;
+      window.speechSynthesis.speak(this.speechSynthesis);
+
+      this.speechSynthesis.onend = () => {console.log("TTS ended"); resolve()};
+    });
 
   }
 }
