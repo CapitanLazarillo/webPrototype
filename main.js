@@ -1,3 +1,5 @@
+import InteractionManager from './InteractionManager.js';
+
 // Create audio context
 window.onload =() => {
   window.actx = new AudioContext();
@@ -343,6 +345,9 @@ function updateTime() {
     let distances = calculateDistancesAndBearings();
     // Call interaction manager
     interactionManager.updateDistances(distances);
+    let boatTrack = positions[selectedBoat].filter(p => p.t <= currentTime)
+    let latest = boatTrack[boatTrack.length - 1];
+    interactionManager.updateBearing(latest.c)
   }
 
 

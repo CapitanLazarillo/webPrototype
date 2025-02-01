@@ -1,9 +1,12 @@
 
+import { Mode, ModeNorth } from './Mode.js';
 
-class InteractionManager {
+
+export class InteractionManager {
 
   // Modes (constant reporting)
   modes = ["apagado", "norte", "rumbo", "amarre", "boia 1", "boia 2", "boia 3"];
+  modeObjects = [];
   selectedModeIndex = 0;
 
   // Warnings
@@ -19,14 +22,27 @@ class InteractionManager {
 
   // Distances (calculated in main.js)
   distances;
+  selfBearing = 0;
 
   constructor() {
+
+    // Create audio engine
+    this.audioEngine = new AudioEngine();
+
+    // Create Mode objects
+    this.modeObjects = [undefined]; // off
+    for (let i = 1; i < this.modes.length; i++) {
+      if (this.modes[i] == "norte") {
+        this.modeObjects[i] = new ModeNorth(this.modes[i], 10, this.audioEngine);
+      } else
+        this.modeObjects[i] = new Mode(this.modes[i], 10, this.audioEngine);
+    }
+
 
     // Keydown (space) interaction
     this.createEventBindings();
 
-    // Create audio engine
-    this.audioEngine = new AudioEngine();
+    
 
   }
 
@@ -60,7 +76,7 @@ class InteractionManager {
 
   singlePressHandler = () => {
     this.changeMode();
-    this.audioEngine.speakText('Modo ' + this.modes[this.selectedModeIndex]);
+    //this.audioEngine.speakText('Modo ' + this.modes[this.selectedModeIndex]);
   }
 
   doublePressHandler = () => {
@@ -92,6 +108,8 @@ class InteractionManager {
   // Change mode
   changeMode = () => {
     this.selectedModeIndex = (this.selectedModeIndex + 1) % this.modes.length;
+    if (this.selectedModeIndex != 0)
+      this.modeObjects[this.selectedModeIndex].modeActivated();
   }
 
   // Activate / deactivate warning
@@ -117,6 +135,11 @@ class InteractionManager {
 
   // UPDATE
   update(dt) {
+
+    // Update mode
+    if (this.selectedModeIndex != 0){
+      this.modeObjects[this.selectedModeIndex].update(dt, this.degreesToClockNumber(this.selfBearing), this.selfBearing);
+    }
 
     if (this.warningsStatus[1]) { // Close objects
       this.warningsTimer += dt;
@@ -144,5 +167,12 @@ class InteractionManager {
   updateDistances(distances) {
     this.distances = distances;
   }
+  updateBearing(angle) {
+    this.selfBearing = angle;
+  }
 
 }
+
+
+
+export default InteractionManager
