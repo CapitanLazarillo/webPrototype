@@ -1,5 +1,5 @@
 
-import { Mode, ModeNorth, ModeBearing, ModeHome} from './Mode.js';
+import { Mode, ModeNorth, ModeBearing, ModeHome, ModeBuoy} from './Mode.js';
 
 
 export class InteractionManager {
@@ -7,7 +7,7 @@ export class InteractionManager {
   // Modes (constant reporting)
   modes = ["apagado", "norte", "rumbo", "amarre", "boya 1", "boya 2", "boya 3"];
   modeObjects = [];
-  modeConstructors = ["", ModeNorth, ModeBearing, ModeHome, Mode, Mode, Mode];
+  modeConstructors = ["", ModeNorth, ModeBearing, ModeHome, ModeBuoy, ModeBuoy, ModeBuoy];
   selectedModeIndex = 0;
 
   // Warnings
@@ -134,6 +134,12 @@ export class InteractionManager {
         let distHome = distHomeArray[0];
         this.modeObjects[this.selectedModeIndex].update(dt, distHome.distance, distHome.relBearing);
       } 
+      // Buoys
+      else if (this.modes[this.selectedModeIndex].includes("boya")){
+        let distBuoyArray = this.distances.filter(item => item.name == this.modes[this.selectedModeIndex]);
+        let distBuoy = distBuoyArray[0];
+        this.modeObjects[this.selectedModeIndex].update(dt, distBuoy.distance, distBuoy.relBearing);
+      }
       // Other modes
       else
         this.modeObjects[this.selectedModeIndex].update(dt, this.selfBearing);

@@ -22,13 +22,13 @@ distanceConversion = (meters) => {
   // Close (1 to 20)
   if (hullDistance < 20) {
     text = Math.round(hullDistance) + ' esloras.';
-  } 
+  }
   // Mid-range (10, 15, 20, 25, 30...)
-  else if (hullDistance < 50) {  
+  else if (hullDistance < 50) {
     text = Math.round(hullDistance * 2 / 10) * 10 / 2 + ' esloras.';
-  } 
+  }
   // Long-range (50-100)
-  else if (nauticalMiles < 0.5){
+  else if (nauticalMiles < 0.5) {
     text = Math.round(hullDistance / 10) * 10 + ' esloras.';
   }
   // Far
@@ -38,4 +38,12 @@ distanceConversion = (meters) => {
   }
 
   return text;
+}
+
+
+
+
+clockNumberToESFileName = (clockNumber) => {
+  let numbers = ["una", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve", "diez", "once", "doce"];
+  return numbers[clockNumber - 1];
 }

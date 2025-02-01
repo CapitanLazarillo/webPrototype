@@ -37,6 +37,11 @@ class Mode {
 
 
 
+
+
+
+
+
 class ModeNorth extends Mode {
 
   update = (dt, bearing) => {
@@ -60,6 +65,10 @@ class ModeNorth extends Mode {
 
 
 
+
+
+
+
 class ModeBearing extends ModeNorth {
 
   sendSignal = (bearing) => {
@@ -67,6 +76,10 @@ class ModeBearing extends ModeNorth {
     console.log("Modo rumbo " + degreesToClockNumber(bearing) + ", " + bearing);
   }
 }
+
+
+
+
 
 
 
@@ -97,7 +110,29 @@ class ModeHome extends Mode {
 }
 
 
-export { Mode, ModeNorth, ModeBearing, ModeHome };
+
+
+
+
+class ModeBuoy extends ModeHome {
+
+  sendSignal = (distanceToBuoy, relBearing) => {
+    let clockAngle = degreesToClockNumber(relBearing);
+    let buoyFileName = this.name.replace(" ", "");
+    let alasFileName = 'alas';
+    let clockFileName = clockNumberToESFileName(clockAngle);
+    
+    this.audioEngine.playAudioFile(buoyFileName, relBearing)
+    .then(() => this.audioEngine.playAudioFile(alasFileName, relBearing))
+    .then(() => this.audioEngine.playAudioFile(clockFileName, relBearing))
+    .then(() => this.audioEngine.speakText("A " + distanceConversion(distanceToBuoy)));
+
+    console.log("Modo " + this.name + ", " + clockAngle + ", " + relBearing + ", " + parseInt(distanceToBuoy));
+  }
+}
+
+
+export { Mode, ModeNorth, ModeBearing, ModeHome, ModeBuoy };
 
 
 
