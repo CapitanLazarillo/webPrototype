@@ -23,7 +23,7 @@ class AudioEngine {
     this.audioContext = audioContext;
 
     // Stereo
-    if (this.audioContext.destination.maxChannelCount < 2){
+    if (this.audioContext.destination.maxChannelCount < 2) {
       alert("Only one audio channel output in your computer. Stereo and spatial audio not possible.");
     }
 
@@ -98,25 +98,40 @@ class AudioEngine {
   }
 
   playAudioFile = (fileName, angle) => {
-    if (this.audioBuffers[fileName] == undefined) {
-      debugger;
-    }
+    return new Promise((resolve, reject) => {
+      // No audio
+      if (this.audioBuffers[fileName] == undefined) {
+        reject(new Error('Audio file ' + fileName + ' not found / loaded.'));
+        debugger;
+      }
 
-    const source = this.audioContext.createBufferSource(); // Maybe only one source?
-    source.buffer = this.audioBuffers[fileName];
+      const source = this.audioContext.createBufferSource(); // Maybe only one source?
+      source.buffer = this.audioBuffers[fileName];
 
-    // Position the source (panner)
-    this.panner.positionZ.value = -Math.cos(angle * Math.PI / 180) * 2;
-    this.panner.positionX.value = Math.sin(angle * Math.PI / 180) * 2;
+      // Position the source (panner)
+      this.panner.positionZ.value = -Math.cos(angle * Math.PI / 180) * 2;
+      this.panner.positionX.value = Math.sin(angle * Math.PI / 180) * 2;
 
-    console.log(parseFloat(this.panner.positionZ.value, 1) + ", " + parseFloat(this.panner.positionX.value, 1));
 
-    // Connect pipeline
-    source.connect(this.panner);
-    this.panner.connect(this.audioContext.destination);
+      console.log(parseFloat(this.panner.positionZ.value, 1) + ", " + parseFloat(this.panner.positionX.value, 1));
 
-    // Play audio
-    source.start();
+
+      // Connect pipeline
+      source.connect(this.panner);
+      this.panner.connect(this.audioContext.destination);
+
+      // Return promise
+      source.onended = () => resolve();
+
+      // Play audio
+      source.start();
+    });
+
+
+
+
+
+
 
   }
 }

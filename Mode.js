@@ -84,11 +84,13 @@ class ModeHome extends Mode {
   sendSignal = (distanceToHome, relBearing) => {
 
     let clockAngle = degreesToClockNumber(relBearing);
-    this.audioEngine.speakText("A " + parseInt(distanceToHome) + " metros.")
+
+    // Distance relation
+
+    this.audioEngine.playAudioFile("H" + clockAngle, relBearing)
       .then(() => {
-        this.audioEngine.playAudioFile("H" + clockAngle, relBearing)
+        this.audioEngine.speakText("A " + parseInt(distanceToHome) + " metros.")
       });
-    // .then(this.audioEngine.speakText("A " + distanceToHome + " metros."))
 
   }
 }
