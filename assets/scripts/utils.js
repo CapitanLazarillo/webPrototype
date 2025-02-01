@@ -28,7 +28,7 @@ distanceConversion = (meters) => {
     text = Math.round(hullDistance * 2 / 10) * 10 / 2 + ' esloras.';
   } 
   // Long-range (50-100)
-  else if (hullDistance < 100){
+  else if (nauticalMiles < 0.5){
     text = Math.round(hullDistance / 10) * 10 + ' esloras.';
   }
   // Far
