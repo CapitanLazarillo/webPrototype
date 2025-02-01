@@ -25,8 +25,8 @@ export class InteractionManager {
   distances;
   selfBearing = 0;
 
-  constructor() {
-
+  constructor(forceDistanceCalculations) {
+    this.forceDistanceCalculations = forceDistanceCalculations;
     // Create audio engine
     this.audioEngine = new AudioEngine();
 
@@ -74,8 +74,10 @@ export class InteractionManager {
   }
 
   singlePressHandler = () => {
+    // Update distances
+    this.forceDistanceCalculations();
+    // Change mode
     this.changeMode();
-    //this.audioEngine.speakText('Modo ' + this.modes[this.selectedModeIndex]);
   }
 
   doublePressHandler = () => {
