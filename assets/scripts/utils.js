@@ -8,3 +8,34 @@ degreesToClockNumber = (degrees) => {
   }
   return clockNumber;
 }
+
+
+distanceConversion = (meters) => {
+  // Distance relation units
+  let text = '';
+  // Nautical miles
+  let nauticalMiles = meters / 1852;
+  // Hull distance
+  let hullDistance = meters / window.hullLength;
+  // Hull distance 
+
+  // Close (1 to 20)
+  if (hullDistance < 20) {
+    text = Math.round(hullDistance) + ' esloras.';
+  } 
+  // Mid-range (10, 15, 20, 25, 30...)
+  else if (hullDistance < 50) {  
+    text = Math.round(hullDistance * 2 / 10) * 10 / 2 + ' esloras.';
+  } 
+  // Long-range (50-100)
+  else if (hullDistance < 100){
+    text = Math.round(hullDistance / 10) * 10 + ' esloras.';
+  }
+  // Far
+  else {
+    let roundedNM = (Math.round(nauticalMiles * 2)) / 2;
+    text = roundedNM + ' millas náuticas.'
+  }
+
+  return text;
+}

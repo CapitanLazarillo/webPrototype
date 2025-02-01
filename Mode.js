@@ -76,7 +76,7 @@ class ModeHome extends Mode {
   update = (dt, distanceToHome, relBearing) => {
     this.timer += dt;
     if (this.timer > this.period) {
-      this.timer = 0;
+      this.timer = 0; // Timer when finishing to speak or regular periods?
       this.sendSignal(distanceToHome, relBearing);
     }
   }
@@ -84,13 +84,14 @@ class ModeHome extends Mode {
   sendSignal = (distanceToHome, relBearing) => {
 
     let clockAngle = degreesToClockNumber(relBearing);
-
-    // Distance relation
-
+    // Start with orientation
     this.audioEngine.playAudioFile("H" + clockAngle, relBearing)
       .then(() => {
-        this.audioEngine.speakText("A " + parseInt(distanceToHome) + " metros.")
+        // And then the distance
+        this.audioEngine.speakText("A " + distanceConversion(distanceToHome))
       });
+
+    console.log("Modo amarre " + clockAngle + ", " + relBearing + ", " + parseInt(distanceToHome));
 
   }
 }

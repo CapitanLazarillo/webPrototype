@@ -1,5 +1,7 @@
 import InteractionManager from './InteractionManager.js';
 
+window.hullLength = 5.8; // meters
+
 // Create audio context
 window.onload =() => {
   window.actx = new AudioContext();

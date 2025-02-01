@@ -112,16 +112,15 @@ class AudioEngine {
       this.panner.positionZ.value = -Math.cos(angle * Math.PI / 180) * 2;
       this.panner.positionX.value = Math.sin(angle * Math.PI / 180) * 2;
 
-
-      console.log(parseFloat(this.panner.positionZ.value, 1) + ", " + parseFloat(this.panner.positionX.value, 1));
-
-
       // Connect pipeline
       source.connect(this.panner);
       this.panner.connect(this.audioContext.destination);
 
       // Return promise
-      source.onended = () => resolve();
+      source.onended = () => {
+        console.log("Play audio file ended");
+        resolve();
+      };
 
       // Play audio
       source.start();
