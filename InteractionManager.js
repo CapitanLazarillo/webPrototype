@@ -33,9 +33,9 @@ export class InteractionManager {
     this.modeObjects = [undefined]; // off
     for (let i = 1; i < this.modes.length; i++) {
       if (this.modes[i] == "norte") {
-        this.modeObjects[i] = new ModeNorth(this.modes[i], 10, this.audioEngine);
+        this.modeObjects[i] = new ModeNorth(this.modes[i], 5, this.audioEngine);
       } else
-        this.modeObjects[i] = new Mode(this.modes[i], 10, this.audioEngine);
+        this.modeObjects[i] = new Mode(this.modes[i], 5, this.audioEngine);
     }
 
 
