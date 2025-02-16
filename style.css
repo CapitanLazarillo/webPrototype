@@ -20,6 +20,9 @@ body {
 button {
   cursor: pointer;
   background-color: var(--blue);
+  border-radius: 10px;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 button:hover {
@@ -123,6 +126,6 @@ button:hover {
   cursor: pointer;
 }
 
-.selected-boat {
+.selected-button {
   background-color: var(--lightRed)
 }

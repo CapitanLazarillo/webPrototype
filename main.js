@@ -144,11 +144,11 @@ function centerOnBoat(id) {
     let ch = boatList.children[i];
     // Selected
     if (ch.innerText == id) {
-      ch.classList.add("selected-boat");
+      ch.classList.add("selected-button");
     }
     // Not selected
     else {
-      ch.classList.remove("selected-boat");
+      ch.classList.remove("selected-button");
     }
   }
 
@@ -312,16 +312,20 @@ function updateTimeline(time) {
 // Timeline control
 let currentTime = Math.min(...Object.values(positions).flat().map(p => p.t));
 let speed = 1;
-let playing = true;
+let isPlaying = true;
 play();
 
 function play() {
-  playing = true;
+  isPlaying = true;
+  document.getElementById("play").classList.add("selected-button");
+  document.getElementById("pause").classList.remove("selected-button");
   requestAnimationFrame(updateTime);
 }
 
 function pause() {
-  playing = false;
+  isPlaying = false;
+  document.getElementById("pause").classList.add("selected-button");
+  document.getElementById("play").classList.remove("selected-button");
 }
 
 
@@ -345,7 +349,7 @@ let prevTime = performance.now();
 let calcDistancesTimeout = 0.5; // seconds
 let calcDistancesTimer = 0;
 function updateTime() {
-  if (!playing) return;
+  if (!isPlaying) return;
   let dt = performance.now() - prevTime;
 
   // In case of a long pause, clamp dt

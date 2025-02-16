@@ -141,11 +141,11 @@ export class InteractionManager {
       let ch = modesList.children[i];
       // Selected
       if (ch.innerText == this.modes[this.selectedModeIndex]) {
-        ch.classList.add("selected-boat");
+        ch.classList.add("selected-button");
       }
       // Not selected
       else {
-        ch.classList.remove("selected-boat");
+        ch.classList.remove("selected-button");
       }
     }
   }
