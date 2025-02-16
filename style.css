@@ -56,6 +56,18 @@ body {
   width: 80vw;
 }
 
+#button-emulator {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  bottom: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index:1;
+  border-radius: 10px;
+}
+
 #timeline {
   position: absolute;
   bottom: 10px;

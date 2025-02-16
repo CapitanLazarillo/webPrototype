@@ -19,6 +19,8 @@ export class InteractionManager {
 
   // Keydown timeout (time between key presses)
   keyTimeout = 300; // ms
+  pressCount = 0;
+  timeout;
 
 
   // Distances (calculated in main.js)
@@ -48,29 +50,38 @@ export class InteractionManager {
   // USER EVENTS
   // Event binding
   createEventBindings = () => {
-    let pressCount = 0;
-    let timeout;
+    // Keydown
     document.addEventListener('keydown', (event) => {
       if (event.code === 'Space') { // Check if the pressed key is the spacebar
-        pressCount++;
-
-        clearTimeout(timeout); // Clear any existing timeout to reset the detection window
-
-        timeout = setTimeout(() => {
-          if (pressCount === 1) {
-            this.singlePressHandler();
-          } else if (pressCount === 2) {
-            this.doublePressHandler();
-          } else if (pressCount === 3) {
-            this.triplePressHandler();
-          }
-          else if (pressCount > 3) {
-            this.quadruplePressHandler();
-          }
-          pressCount = 0; // Reset the count after handling
-        }, this.keyTimeout); // Adjust the delay (in milliseconds) to suit your needs
+        this.pressButtonManager();
       }
     });
+    // Button emulator
+    document.getElementById("button-emulator").addEventListener("click", () => {
+      this.pressButtonManager();
+    })
+
+  }
+
+
+  pressButtonManager = () => {
+    this.pressCount++;
+
+    clearTimeout(this.timeout); // Clear any existing timeout to reset the detection window
+
+    this.timeout = setTimeout(() => {
+      if (this.pressCount === 1) {
+        this.singlePressHandler();
+      } else if (this.pressCount === 2) {
+        this.doublePressHandler();
+      } else if (this.pressCount === 3) {
+        this.triplePressHandler();
+      }
+      else if (this.pressCount > 3) {
+        this.quadruplePressHandler();
+      }
+      this.pressCount = 0; // Reset the count after handling
+    }, this.keyTimeout); // Adjust the delay (in milliseconds) to suit your needs
   }
 
   singlePressHandler = () => {
@@ -92,11 +103,11 @@ export class InteractionManager {
 
   quadruplePressHandler = () => {
     // Mode none
-    this.selectedModeIndex = 0;
+    this.setMode("apagado");
 
     // Deactivate all warnings
-    for (let wS in this.warningsStatus) {
-      wS = false;
+    for (let i = 0; i < this.warningsStatus.length; i++) {
+      this.warningsStatus[i] = false;
     }
 
     this.audioEngine.speakText('Todos los avisos y modos apagados.');

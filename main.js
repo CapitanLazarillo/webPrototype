@@ -312,7 +312,8 @@ function updateTimeline(time) {
 // Timeline control
 let currentTime = Math.min(...Object.values(positions).flat().map(p => p.t));
 let speed = 1;
-let playing = false;
+let playing = true;
+play();
 
 function play() {
   playing = true;
