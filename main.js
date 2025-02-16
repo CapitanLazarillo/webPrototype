@@ -197,6 +197,8 @@ function updateBoatPositionsWithHTML(time) {
       boatElement.style.cursor = 'pointer';
       boatElement.style.rotate = latest.c + 'deg';
       boatElement.id = latest.i;
+      if (boatInternalIds[boatElement.id] == selectedBoat)
+        boatElement.classList.add("selected-button");
 
 
       // Add onclick event
