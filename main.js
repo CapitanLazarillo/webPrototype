@@ -63,6 +63,18 @@ boatIds.forEach(id => {
   boatList.appendChild(listItem);
 });
 
+// Create Modes List
+const modesList = document.getElementById('modes-list');
+interactionManager.modes.forEach(id => {
+  const listItem = document.createElement('button');
+  listItem.textContent = `${id}`;
+  listItem.addEventListener('click', () => {
+    // Set mode
+    interactionManager.setMode(id);
+  });
+  modesList.appendChild(listItem);
+});
+
 
 // POINTS OF INTEREST
 

@@ -113,6 +113,8 @@ export class InteractionManager {
       this.modeObjects[this.selectedModeIndex].modeActivated();
     else
       this.audioEngine.speakText('Modo apagado', true);
+    // Update html
+    this.updateHTML();
   }
 
   // Activate / deactivate warning
@@ -122,7 +124,20 @@ export class InteractionManager {
 
 
 
-
+  updateHTML() {
+    const modesList = document.getElementById('modes-list');
+    for (let i = 0; i < modesList.children.length; i++) {
+      let ch = modesList.children[i];
+      // Selected
+      if (ch.innerText == this.modes[this.selectedModeIndex]) {
+        ch.classList.add("selected-boat");
+      }
+      // Not selected
+      else {
+        ch.classList.remove("selected-boat");
+      }
+    }
+  }
 
 
 
@@ -177,6 +192,23 @@ export class InteractionManager {
   }
   updateBearing(angle) {
     this.selfBearing = angle;
+  }
+
+  // Set mode
+  setMode(modeId) {
+    let modeIdx = this.modes.indexOf(modeId);
+    if (modeIdx == -1) {
+      debugger;
+    }
+
+    this.selectedModeIndex = modeIdx;
+    if (this.selectedModeIndex != 0)
+      this.modeObjects[this.selectedModeIndex].modeActivated();
+    else
+      this.audioEngine.speakText('Modo apagado', true);
+
+    // Update html
+    this.updateHTML();
   }
 
 }

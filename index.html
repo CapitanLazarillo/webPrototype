@@ -5,8 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Capitán Lazarillo simulator</title>
-  <script src="https://cdn.jsdelivr.net/npm/ol@v10.3.1/dist/ol.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.3.1/ol.css">
+  <script src="lib/openlayers/ol@v10.3.1.js"></script>
+  <link rel="stylesheet" href="lib/openlayers/ol@v10.3.1.css">
   <link rel="stylesheet" href="./style.css">
 
   <script src="assets/scripts/utils.js"></script>
@@ -17,7 +17,7 @@
 
 <body>
 
-  <div id="sidebar">
+  <div id="boats">
     <h3>Select a boat</h3>
     <div id="boat-list"></div>
   </div>
@@ -39,6 +39,12 @@
       <option value="32">x32</option>
       <option value="64">x64</option>
     </select>
+  </div>
+
+
+  <div id="modes">
+    <h3>Modes</h3>
+    <div id="modes-list"></div>
   </div>
 
   <div id="map"></div>
